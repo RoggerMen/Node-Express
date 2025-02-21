@@ -34,12 +34,91 @@
 
   // Tambien podemos USAR otro tipo de formato el JSON ".json"(javascript object notetion)
   // SE USAN MAS PARA APIS, DONDE COMUNICARAN DATOS A LOS CLIENTES LA CUAL LOS FRONTEND SE ENCARGAN DE RENDERIZAR ESTOS DATOS(LA INFORMACION) AL LADO DEL CLIENTE PARA QUE LO PUEDA VER DE MANERA DISEÑADA Y ORGANIZADA EN LA PAGINA(CLIENTE)
+  // SI ES UNA LISTA DE PRODUCTOS TENEMOS QUE HACERLOS EN ARRAYS "[]"
   app.get("/products", (req, res) => {
+    res.json([
+      {
+        name: "Product 1",
+        price: 1000,
+        store: "VEGA"
+      },
+      {
+        name: "Product 2",
+        price: 1200,
+        store: "OXXO"
+      }
+    ]);
+  })
+  // Endpoint para recibir o devolver el DETALLE DE UN PRODUCTO recibiendo el "id"
+  // RECIBIMOS UN IDENTIFICADOR(id) LA CUAL LE AGREGAMOS LOS ":"(DOS PUNTOS) PARA DECIR QUE VA A SER UN PARAMETRO
+  // DESDE LA PARTE DEL CLIENTE NOS DARAN EL PARAMETRO "id" PARA USARLO EN LA PARTE SERVIDOR USANDO EL "req"
+  // USAMOS EL "req.params" PARA RECIBIR EL ID DEL PRODUCTO
+  // LO SIGUIENTE DEL "req.params" por ejemplo id, o productId VIENE A SER DE ACUERDO A LO QUE COLOQUES EN LA RUTA(PATH) '/products/:id' o '/products/:productId' SERA LO SIGUIENTE DEL "req.params" por ejemplo "req.params.id" o "req.params.productId"
+  // PUEDES TAMBIEN HACERLO DE OTRA FORMA QUE ES MAS LIMPIA Y ES USANDO LA DESTRUCTURACION DE "ECMASCRIPT"
+  // Esta sintaxis "req.params" HACE QUE DE TODOS LOS PARAMETROS QUE PUEDE TENER ESTE OBJETO SOLO ME INTERESA EL "id" HACIENDO LA DESTRUCTURACION DE ESTA MANERA { id }
+  // const { id } = req.params
+  app.get('/products/:id', (req, res) =>{
+    const id = req.params.id;
     res.json({
+      id,
       name: "Product 1",
       price: 1000,
       store: "VEGA"
+    })
+  });
+
+  // obtener un endpoint con 2 PARAMETROS
+  // ACA MOSTRAMOS LA DESTRUCTURACION
+  // DE ESTA MANERA ESTAMOS CAPTURANDO LOS PARAMETROS QUE VIENEN POR URL Y LOS ESTAMOS RECOGIENDO DESDE NUESTRO PROGRAMA Y LOS IMPRIMIMOS DE RETORNO
+  app.get('/categories/:categoryId/products/:productId', (req, res) => {
+    const { categoryId, productId } = req.params;
+    res.json({
+      categoryId,
+      productId,
     });
+  });
+
+  // CON CONDICIONAL PARA AGARRAR Y MOSTRAR SI CUMPLE CON LA QUE EN EL PATH EL PARAMETRO ES 1 ENTONCES MUESTRA ESE sino el otro por defecto
+  app.get('/categories/:categoryId', (req, res) => {
+    const { categoryId } = req.params;
+    console.log(categoryId);
+
+    let responseData = {
+      categoryId,
+      name: 'Others',
+      products: 2000
+    };
+
+    if (categoryId === "1") {
+      responseData = {
+        categoryId,
+        name: 'Food',
+        products: 1000
+      };
+    }
+
+    res.json(responseData);
+  });
+
+  app.get('/categories',(req,res)=>{
+    const {categoryId}= req.params
+    res.json([
+      {
+        categoryId,
+        category: 'Food',
+        products: []
+      },
+      {
+        categoryId,
+        category: 'Games',
+        products: []
+      },
+      {
+        categoryId,
+        category: 'clothes',
+        products: []
+      },
+    ])
   })
 
 /**
