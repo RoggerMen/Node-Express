@@ -20,6 +20,8 @@
     "prettier": "^3.5.1"
   },
   "dependencies": {
-    "express": "^4.21.2"
+    "@faker-js/faker": "^9.5.0",
+    "express": "^4.21.2",
+    "faker": "^5.5.3"
   }
 }

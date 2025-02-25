@@ -1,19 +1,6 @@
-/** EN LA TERMINAL AGREGAMOS EN DEPENDENCIAS DE DESARROLLO
- * npm i nodemon eslint eslint-config-prettier eslint-plugin-prettier prettier -D
- * tambien aparte npm install @eslint/js --save-dev
-
- */
-/** USAMOS "https://www.toptal.com/developers/gitignore" PARA CREAR TODO PARA ".gitignore" AGREGAMOS El "node","windows", "linux" y "macos"
- */
-/** AGREGAMOS TAREAS EN EL "script" ASI COMO EL "dev","start" y "lint" PARA CORRERLOS SIN PROBLEMA POR COMANDO "npm run dev(dev)" HACIENDOLO CORRER EN NODEMON y "npm run start(produccion) corriendo en el mismo node QUE NOS DA 1 VEZ NO COMO EL "nodemon" QUE SE QUEDA SIEMPRE
- * "scripts": {
-    "dev": "nodemon index.js",
-    "start": "node index.js",
-    "lint": "eslint"
-  },
- */
 
   const express = require('express');
+  const { faker } = require('@faker-js/faker');
 
   const app = express();
   const port = 3000;
@@ -35,37 +22,29 @@
   // Tambien podemos USAR otro tipo de formato el JSON ".json"(javascript object notetion)
   // SE USAN MAS PARA APIS, DONDE COMUNICARAN DATOS A LOS CLIENTES LA CUAL LOS FRONTEND SE ENCARGAN DE RENDERIZAR ESTOS DATOS(LA INFORMACION) AL LADO DEL CLIENTE PARA QUE LO PUEDA VER DE MANERA DISEÑADA Y ORGANIZADA EN LA PAGINA(CLIENTE)
   // SI ES UNA LISTA DE PRODUCTOS TENEMOS QUE HACERLOS EN ARRAYS "[]"
+  /******* ESTA PARTE AGREGAMOS TAMBIEN EL "req.query" *********/
   app.get("/products", (req, res) => {
-    res.json([
-      {
-        name: "Product 1",
-        price: 1000,
-        store: "VEGA"
-      },
-      {
-        name: "Product 2",
-        price: 1200,
-        store: "OXXO"
-      }
-    ]);
+    const products = [];
+    const { size } = req.query;
+    // Con esto hacemos que limit sea por defecto de 10 si no colocamos ningún parametro de consulta(query param)
+    // El "||" es un operador OR, en caso de que "size" no venga seteado, se tomará el valor de 10 como limite
+    const limit = size  || 10;
+    // ACA LO HACEMOS MAS DINAMICO AL QUERER MOSTRAR NUESTROS PRODUCTOS CON FAKER
+    // SEGUN EL TAMAÑO QUE COLOQUEMOS AL "size" NOS VA A HACER EL RECORRIDO EL FOR DE ACUERDO AL "limit" QUE POR SI NO VIENE NADA EN "size" nos dara el valor de 10 como limite y si COLOCAMOS UN PARAMETRO EN LA URL al "size" POR EJEMPLO "?size=1000" ESTE RECORRIDO SERA DE 1000 PRODUCTOS ES DEACUERDO A LO QUE LE COLOQUEMOS AL "size"
+    for (let i = 0; i < limit ; i++) {
+      products.push({
+        id : i+1,
+        name: faker.commerce.productName(),
+        // Lo parseamos porque el precio nos viene como un "string" y lo CONVERTIMOS A NUMERO EN BASE 10
+        price: parseInt(faker.commerce.price(),10),
+        store: faker.company.name(),
+        country: faker.location.country(),
+        image: faker.image.url()
+      });
+    }
+    res.json(products);
   })
-  // Endpoint para recibir o devolver el DETALLE DE UN PRODUCTO recibiendo el "id"
-  // RECIBIMOS UN IDENTIFICADOR(id) LA CUAL LE AGREGAMOS LOS ":"(DOS PUNTOS) PARA DECIR QUE VA A SER UN PARAMETRO
-  // DESDE LA PARTE DEL CLIENTE NOS DARAN EL PARAMETRO "id" PARA USARLO EN LA PARTE SERVIDOR USANDO EL "req"
-  // USAMOS EL "req.params" PARA RECIBIR EL ID DEL PRODUCTO
-  // LO SIGUIENTE DEL "req.params" por ejemplo id, o productId VIENE A SER DE ACUERDO A LO QUE COLOQUES EN LA RUTA(PATH) '/products/:id' o '/products/:productId' SERA LO SIGUIENTE DEL "req.params" por ejemplo "req.params.id" o "req.params.productId"
-  // PUEDES TAMBIEN HACERLO DE OTRA FORMA QUE ES MAS LIMPIA Y ES USANDO LA DESTRUCTURACION DE "ECMASCRIPT"
-  // Esta sintaxis "req.params" HACE QUE DE TODOS LOS PARAMETROS QUE PUEDE TENER ESTE OBJETO SOLO ME INTERESA EL "id" HACIENDO LA DESTRUCTURACION DE ESTA MANERA { id }
-  // const { id } = req.params
-  app.get('/products/:id', (req, res) =>{
-    const id = req.params.id;
-    res.json({
-      id,
-      name: "Product 1",
-      price: 1000,
-      store: "VEGA"
-    })
-  });
+
 
   // obtener un endpoint con 2 PARAMETROS
   // ACA MOSTRAMOS LA DESTRUCTURACION
@@ -119,12 +98,57 @@
         products: []
       },
     ])
+  });
+
+
+/********** ESTAS DOS RUTAS CHOCAN ************/
+/**************** SOLUCION ******************/
+/*********** CAMBIAR ORDEN *****************/
+// todo ENDPOINTS ESPECIFICOS (app.get('/products/filter',funcion callback) debe ir antes de ENDPOINTS DINAMICOS(app.get('/products/:id',funcion callback)
+
+// EL DE PARAMETROS DE RUTA"route parameters".(req.params) Y PARAMETROS DE CONSULTA"query parameters"(req.query)
+// EL DE PARAMETROS DE RUTA"route parameters" TIENE MAS FUERZA Y LLAMARIA LA RUTA "filter" COMO UN "ID" Y  CUMPLIRIA LO DE LA PRIMERA RUTA LA DE '/products/:id' Y NO EL '/products/filter' QUE DEBERIA MOSTRAR AL res.send('YO SOY UN FILTER');
+app.get('/products/filter', (req,res)=>{
+  res.send('YO SOY UN FILTER');
+})
+
+
+app.get('/products/:id', (req, res) =>{
+  const id = req.params.id;
+  res.json({
+    id,
+    name: "Product 1",
+    price: 1000,
+    store: "VEGA"
   })
+});
+
+
+/******* PRAMETROS QUERY(query params) ******/
+// COMO EL PARAMETRO ES OPCIONAL NO VIENE DEFINIDO DIRECTAMENTE EN LA RUTA
+// VIENE CON PARAMETROS DENTRO DE NUESTRO REQUEST
+app.get('/users', (req,res) => {
+  const { limit, offset } = req.query;
+  // Como son opcionales deberiamos hacer una validacion
+  if(limit && offset){
+    res.json({
+      limit,
+      offset
+    });
+    //http://localhost:3000/users?limit=100&offset=0
+    console.log(`Este es el limit => ${limit}`);
+    console.log(`Este el offset => ${offset}`);
+  } else {
+    res.send("No hay parámetros");
+  }
+})
+
+
 
 /**
  *  Conclusión
 app.listen() inicia un servidor Express en un puerto.
-Puede recibir hasta tres argumentos: port, hostname y un callback opcional.
+Puede recibir hasta tres argumentos: port, hostname(opcional) y un callback opcional.
 El callback se ejecuta cuando el servidor se inicia correctamente.
 Se puede manejar errores con .on('error', callback).
 .on('error', (err) => {
