@@ -24,6 +24,7 @@
 
   /***** SINGLE RESPONSABILITY PRINCIPLE ****/
   /*** PRINCIPIO DE RESPONSABILIDAD UNICA ***/
+  // Usamos `routerApi` pasando `app` como argumento
   routerApi(app);
 
 
