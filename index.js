@@ -7,6 +7,11 @@
   const app = express();
   const port = 3000;
 
+  // IMPLEMENTAMOS UN "MIDDLEWARE" NATIVO QUE TIENE "express" QUE ES "express.json()"
+  // ESTE "middleware" LO VAMOS A USAR CUANDO NOSOTROS QUEREMOS EMPEZAR A RECIBIR INFORMACION EN EL FORMATO DE "JSON"
+  // CON ESTE AJUSTE DEBERIAMOS DE RECIBIR INFORMACION DE TIPO JSON QUE NOS ENVIAN POR  "POST"
+  app.use(express.json());
+
   app.get("/", (req, res) =>{
     //console.log(req); // Esto imprimirá todo el objeto req en la consola
     //COMO NOSOTROS NECESITAMOS RETORNAR ENTONCES USAMOS EL RESPONSE

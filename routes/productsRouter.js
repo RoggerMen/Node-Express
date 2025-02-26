@@ -53,6 +53,16 @@ const router = express.Router();
     })
   });
 
+  router.post('/', (req, res) => {
+    // PEDIMOS TODO EL CUERPO
+    const body = req.body;
+    res.json({
+      message: 'created product',
+      data: body
+    })
+  });
+
+
 // CADA UNO DE LAS RUTAS TENDRIA UN MODULO EN ESTE CASO "router"
 module.exports = router;
 
