@@ -45,18 +45,24 @@ const router = express.Router();
 
   router.get('/:id', (req, res) =>{
     const id = req.params.id;
-    res.json({
-      id,
-      name: "Product 1",
-      price: 1000,
-      store: "VEGA"
-    })
+    if(id === "999"){
+      res.status(404).json({
+        message: 'PRODUCTO NO ENCONTRADO - ERROR 404'
+      });
+    } else {
+      res.status(200).json({
+        id,
+        name: "Product 1",
+        price: 1000,
+        store: "VEGA"
+      })
+    }
   });
 
   router.post('/', (req, res) => {
     // PEDIMOS TODO EL CUERPO
     const body = req.body;
-    res.json({
+    res.status(201).json({
       message: 'created product',
       data: body
     })
