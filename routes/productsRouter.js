@@ -33,10 +33,8 @@ const service = new ProductsService
   router.post('/', (req, res) => {
     // PEDIMOS TODO EL CUERPO
     const body = req.body;
-    res.status(201).json({
-      message: 'created product',
-      data: body
-    })
+    const newProduct = service.create(body);
+    res.status(201).json(newProduct);
   });
 
   // el "PATCH" ES MUY PARECIDO A NUESTRO "POST" PORQUE TODO LO VA A RECIBIR EN UN CUERPO
@@ -46,11 +44,8 @@ const service = new ProductsService
     const id = req.params.id;
     // PEDIMOS TODO EL CUERPO
     const body = req.body;
-    res.json({
-      message: 'update some products field',
-      data: body,
-      id
-    })
+    const productPatched = service.update(id, body);
+    res.json(productPatched);
   });
 
 
@@ -70,10 +65,8 @@ const service = new ProductsService
   // EL "DELETE" ES TAMBIEN SIMILAR AL PUT Y PATCH SOLO QUE NO VA A RECIBIR UN CUERPO SOLO EL "id"
   router.delete('/:id', (req, res) => {
     const id = req.params.id;
-    res.json({
-      message: 'DELETED PRODUCT',
-      id
-    })
+    const productDeleted = service.delete(id);
+    res.json(productDeleted)
   });
 
 

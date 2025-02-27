@@ -17,6 +17,8 @@ class ProductsService{
   /*** AQUI LLENAMOS NUESTRO PRODUCTOS ****/
     for (let i = 0; i < limit ; i++) {
       this.products.push({
+        // en el "id" TAMBIEN podriamos usar  id : faker.database.mongodbObjectId(),
+        // PARA NO TENER PROBLEMAS MAS ADELANTE POR EL TEMA DEL ".length + 1" EN LA FUNCION CREATE
         id : String(i+1),
         name: faker.commerce.productName(),
         // Lo parseamos porque el precio nos viene como un "string" y lo CONVERTIMOS A NUMERO EN BASE 10
@@ -28,8 +30,14 @@ class ProductsService{
     }
   }
 
-  create() {
-
+  create(data) {
+    const newProduct = {
+      id : String(this.products.length + 1),
+      ...data
+    }
+    // LE DECIMOS QUE QUEREMOS INSERTAR ESE NUEVO PRODUCTO A NUESTRO ARRAY
+    this.products.push(newProduct);
+    return newProduct;
   }
 
   find(){
@@ -37,17 +45,45 @@ class ProductsService{
   }
 
   findOne(id){
+    // NOS RETORNA EL PRIMER OBJETO ENCONTRADO
     return this.products.find(item => item.id === id );
   }
 
-  update(){
+  update(id, changes){
+    // NOS RETORNA LA POSICION EN LA QUE ESTA EL OBJETO(INDICE)
+    const index = this.products.findIndex(item => item.id === id);
+    // HACEMOS UNA VALIDACION
+    // SI "findIndex" NO ENCUENTRA EL ELEMENTO LO MAS NORMAL ES QUE NOS DEVUELVA EL -1
+    if(index === -1){
+      throw new Error("Product not found")
+    } else {
+      const product = this.products[index];
+      // COMO YA TENEMOS EL "id" Y LOS "changes" Y YA SABEMOS CUAL ES LA POSICION
+      // VAMOS A NUESTRO ARRAY EN MEMORIA("this.products") Y LE DECIMOS "[index" EN LA POSICION EN LA QUE ENCUENTRE EL OBJETO PUES APLIQUE ESOS "CAMBIOS"(changes)
+      this.products[index] = {
+        // NO QUIERO ELIMINAR O CAMBIAR TODO QUIERO PERSISTIR TODO LO QUE HAY DE LOS ATRIBUTOS DEL PRODUCTO Y QUE APLIQUES TODOS LOS NUEVOS CAMBIOS
+       ...product,
+       ...changes
+      };
 
+    }
+    return this.products[index]; // NOS RETORNA EL PRODUCTO CON LOS CAMBIO
   }
 
-  delete(){
-
+  delete(id){
+     // NOS RETORNA LA POSICION EN LA QUE ESTA EL OBJETO(INDICE)
+     const index = this.products.findIndex(item => item.id === id);
+     // HACEMOS UNA VALIDACION
+     // SI "findIndex" NO ENCUENTRA EL ELEMENTO LO MAS NORMAL ES QUE NOS DEVUELVA EL -1
+     if(index === -1){
+       throw new Error("Product not found")
+  } else {
+    // LO QUE NOS PERMITE EL ".splice" ES ENVIAR UNA POSICION PARA PODER ELIMINARLA Y CUANTOS ELEMENTOS ELIMINAR APARTIR DE ESA POSICION
+    // CON "1" LE DECIMOS QUE QUEREMOS ELIMINAR UN ELEMENTO APARTIR DE ESA POSICION OSEA A EL MISMO
+    this.products.splice(index, 1)
   }
-
+  return {message: `El producto con ID => ${id} fue eliminado`};
+  }
 }
 
 
