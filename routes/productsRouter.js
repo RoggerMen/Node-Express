@@ -14,8 +14,10 @@ const service = new ProductsService
 
 // DE ESTA MANERA ESTAMOS SEPARANDO LA RESPONSABILIDAD PORQUE SABEMOS QUE EN "productsRouter" VAMOS A ENCONTRAR TODAS LAS RUTAS QUE TENGAN QUE VER CON LOS "PRODUCTOS"
 
-  router.get("/", (req, res) => {
-    const products = service.find();
+  router.get("/", async (req, res) => {
+    // COMO EL "service.find()" SE VUELVE UNA PROMESA LE COLOCAMOS EL "await"
+    // SE CONVIERTE EN PROMESA PORQUE EN EL ARCHIVO DE "productService.js" LO HACEMOS ASYNC Y TODA FUNCION ASINCRONA SE CONVIERTE EN PROMESA
+    const products = await service.find();
     res.json(products);
   })
 
@@ -24,28 +26,36 @@ const service = new ProductsService
   })
 
 
-  router.get('/:id', (req, res) =>{
+  router.get('/:id', async (req, res) =>{
     const id = req.params.id;
-    const product = service.findOne(id);
+    const product = await service.findOne(id);
     res.json(product);
   });
 
-  router.post('/', (req, res) => {
+  router.post('/', async (req, res) => {
     // PEDIMOS TODO EL CUERPO
     const body = req.body;
-    const newProduct = service.create(body);
+    const newProduct = await service.create(body);
     res.status(201).json(newProduct);
   });
 
   // el "PATCH" ES MUY PARECIDO A NUESTRO "POST" PORQUE TODO LO VA A RECIBIR EN UN CUERPO
   // LA UNICA DIFERENCIA ES QUE AQUI RECIBIMOS UN "id" EL ID DEL PRODUCTO QUE YO QUIERO EDITAR
   // EL "PATCH" NO NOS OBLIGA A ENVIAR TODOS LOS CAMPOS O ATRIBUTOS DEL PRODUCTO A ACTUALIZAR SINO QUE ES MAS FLEXIBLE Y PODEMOS ENVIARLE SOLO LOS QUE QUEREMOS ACTUALIZAR Y NO TODO EL OBJETO COMO LO HACE EL "PUT"
-  router.patch('/:id', (req, res) => {
-    const id = req.params.id;
+  router.patch('/:id', async (req, res) => {
+    try {
+      const id = req.params.id;
     // PEDIMOS TODO EL CUERPO
-    const body = req.body;
-    const productPatched = service.update(id, body);
-    res.json(productPatched);
+      const body = req.body;
+      const productPatched = await service.update(id, body);
+      res.json(productPatched);
+    } catch (e) {
+      res.status(404).json({
+        message: 'Error Producto No Encontrado',
+        // ESTE SE TRAE DEL ARCHIVO "productService.js" del "Throw new Error" SU MENSAJE
+        error: e.message,
+      })
+    }
   });
 
 
@@ -63,9 +73,9 @@ const service = new ProductsService
   });
 
   // EL "DELETE" ES TAMBIEN SIMILAR AL PUT Y PATCH SOLO QUE NO VA A RECIBIR UN CUERPO SOLO EL "id"
-  router.delete('/:id', (req, res) => {
+  router.delete('/:id', async (req, res) => {
     const id = req.params.id;
-    const productDeleted = service.delete(id);
+    const productDeleted = await service.delete(id);
     res.json(productDeleted)
   });
 

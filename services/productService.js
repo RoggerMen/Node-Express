@@ -30,7 +30,7 @@ class ProductsService{
     }
   }
 
-  create(data) {
+  async create(data) {
     const newProduct = {
       id : String(this.products.length + 1),
       ...data
@@ -41,15 +41,20 @@ class ProductsService{
   }
 
   find(){
+    return new Promise((resolve, reject)=>{
+      setTimeout(() => {
+        resolve(this.products);
+      }, 5000);
+    })
     return this.products;
   }
 
-  findOne(id){
+  async findOne(id){
     // NOS RETORNA EL PRIMER OBJETO ENCONTRADO
     return this.products.find(item => item.id === id );
   }
 
-  update(id, changes){
+  async update(id, changes){
     // NOS RETORNA LA POSICION EN LA QUE ESTA EL OBJETO(INDICE)
     const index = this.products.findIndex(item => item.id === id);
     // HACEMOS UNA VALIDACION
@@ -70,7 +75,7 @@ class ProductsService{
     return this.products[index]; // NOS RETORNA EL PRODUCTO CON LOS CAMBIO
   }
 
-  delete(id){
+  async delete(id){
      // NOS RETORNA LA POSICION EN LA QUE ESTA EL OBJETO(INDICE)
      const index = this.products.findIndex(item => item.id === id);
      // HACEMOS UNA VALIDACION
