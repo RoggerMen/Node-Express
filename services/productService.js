@@ -46,7 +46,6 @@ class ProductsService{
         resolve(this.products);
       }, 5000);
     })
-    return this.products;
   }
 
   async findOne(id){
