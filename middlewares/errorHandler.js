@@ -16,6 +16,16 @@ function errorHandler(error, req, res, next) {
         stack: error.stack
     });
 }
+// CREAMOS UN MIDDLEWARE PARA EL "BOOM"
+// Si hay un error y es de tipo "BOOM" SE EJECUTA ESE "MIDDLEWARE" Y SI NO LO ES CON EL "next(error)" HACEMOS QUE EJECUTE OTRO MIDDLEWARE
+function boomErrorHandler(error, req, res, next) {
+  if (error.isBoom) {
+    const { output } = error;
+    res.status(output.statusCode).json(output.payload);
+  } else {
+    next(error)
+  }
+}
 
 
-module.exports = { logErrors, errorHandler };
+module.exports = { logErrors, errorHandler, boomErrorHandler };

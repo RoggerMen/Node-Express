@@ -47,7 +47,7 @@ const service = new ProductsService
   // el "PATCH" ES MUY PARECIDO A NUESTRO "POST" PORQUE TODO LO VA A RECIBIR EN UN CUERPO
   // LA UNICA DIFERENCIA ES QUE AQUI RECIBIMOS UN "id" EL ID DEL PRODUCTO QUE YO QUIERO EDITAR
   // EL "PATCH" NO NOS OBLIGA A ENVIAR TODOS LOS CAMPOS O ATRIBUTOS DEL PRODUCTO A ACTUALIZAR SINO QUE ES MAS FLEXIBLE Y PODEMOS ENVIARLE SOLO LOS QUE QUEREMOS ACTUALIZAR Y NO TODO EL OBJETO COMO LO HACE EL "PUT"
-  router.patch('/:id', async (req, res) => {
+  router.patch('/:id', async (req, res, next) => {
     try {
       const id = req.params.id;
     // PEDIMOS TODO EL CUERPO
@@ -55,11 +55,7 @@ const service = new ProductsService
       const productPatched = await service.update(id, body);
       res.json(productPatched);
     } catch (e) {
-      res.status(404).json({
-        message: 'Error Producto No Encontrado',
-        // ESTE SE TRAE DEL ARCHIVO "productService.js" del "Throw new Error" SU MENSAJE
-        error: e.message,
-      })
+      next(e);
     }
   });
 

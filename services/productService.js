@@ -1,5 +1,6 @@
 
 const { faker } = require('@faker-js/faker');
+const boom = require('@hapi/boom');
 
 class ProductsService{
 
@@ -25,7 +26,9 @@ class ProductsService{
         price: parseInt(faker.commerce.price(),10),
         store: faker.company.name(),
         country: faker.location.country(),
-        image: faker.image.url()
+        image: faker.image.url(),
+        // PRODUCTO QUE NO SE PUEDE VER OSEA QUE LO BLOQUEA(PRODUCTO BLOQUEADO)
+        isBlock: faker.datatype.boolean(),
       });
     }
   }
@@ -49,9 +52,18 @@ class ProductsService{
   }
 
   async findOne(id){
-    const name = this.getTotal();
+
     // NOS RETORNA EL PRIMER OBJETO ENCONTRADO
-    return this.products.find(item => item.id === id );
+    const product = this.products.find(item => item.id === id );
+    if (!product) {
+      // GENERAMOS UNA VALIDACION POR SI HAY ERROR
+      throw boom.notFound("Product not found");
+    }
+    if (product.isBlock) {
+      // "conflict" es un error de tipo 409
+      throw boom.conflict("Product is block");
+    }
+    return product;
   }
 
   async update(id, changes){
@@ -60,7 +72,7 @@ class ProductsService{
     // HACEMOS UNA VALIDACION
     // SI "findIndex" NO ENCUENTRA EL ELEMENTO LO MAS NORMAL ES QUE NOS DEVUELVA EL -1
     if(index === -1){
-      throw new Error("Product not found")
+      throw boom.notFound("Product not found");
     } else {
       const product = this.products[index];
       // COMO YA TENEMOS EL "id" Y LOS "changes" Y YA SABEMOS CUAL ES LA POSICION
@@ -81,7 +93,7 @@ class ProductsService{
      // HACEMOS UNA VALIDACION
      // SI "findIndex" NO ENCUENTRA EL ELEMENTO LO MAS NORMAL ES QUE NOS DEVUELVA EL -1
      if(index === -1){
-       throw new Error("Product not found")
+      throw boom.notFound("Product not found");
   } else {
     // LO QUE NOS PERMITE EL ".splice" ES ENVIAR UNA POSICION PARA PODER ELIMINARLA Y CUANTOS ELEMENTOS ELIMINAR APARTIR DE ESA POSICION
     // CON "1" LE DECIMOS QUE QUEREMOS ELIMINAR UN ELEMENTO APARTIR DE ESA POSICION OSEA A EL MISMO

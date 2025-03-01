@@ -5,7 +5,7 @@
   const routerApi = require('./routes');
 
   // IMPORTAMOS LOS "middlewares"
-  const { logErrors, errorHandler } = require('./middlewares/errorHandler');
+  const { logErrors, errorHandler, boomErrorHandler } = require('./middlewares/errorHandler');
 
   const app = express();
   const port = 3000;
@@ -38,6 +38,7 @@
   /*** USAMOS LAS FUNCIONES "MIDDLEWARES" ***/
   // En el orden que los pongamos en estas lineas va a ser el orden con el cual se va a ejecutar uno tras el otro
   app.use(logErrors);
+  app.use(boomErrorHandler);  // Este middleware maneja las excepciones de Boom y las convierte en respuestas HTTP adecuadas
   app.use(errorHandler);
 
   // DECIRLE A NUESTRA APLICACION QUE DEBE ESCUCHAR EN UN PUERTO EN ESPECIFICO
