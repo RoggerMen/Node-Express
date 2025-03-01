@@ -25,11 +25,16 @@ const service = new ProductsService
     res.send('YO SOY UN FILTER');
   })
 
-
-  router.get('/:id', async (req, res) =>{
-    const id = req.params.id;
-    const product = await service.findOne(id);
-    res.json(product);
+// LE COLOCAMOS EL "next" PORQUE VAMOS A TRABAJAR CON LOS "middlewares" YA QUE EL ERROR OCURRE EN EL "findOne"
+  router.get('/:id', async (req, res, next) =>{
+    // AGREGAMOS UN TRYCATCH
+    try {
+      const id = req.params.id;
+      const product = await service.findOne(id);
+      res.json(product);
+    } catch (error) { // SI HAY ERROR DEBERIA EJECUTAR LOS "MIDDLEWARES" DE TIPO ERROR
+      next(error);
+    }
   });
 
   router.post('/', async (req, res) => {

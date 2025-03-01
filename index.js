@@ -4,6 +4,9 @@
   // EL ARCHIVO "index" ES EL QUE SE BUSCA POR AUTOMATICO
   const routerApi = require('./routes');
 
+  // IMPORTAMOS LOS "middlewares"
+  const { logErrors, errorHandler } = require('./middlewares/errorHandler');
+
   const app = express();
   const port = 3000;
 
@@ -32,6 +35,10 @@
   // Usamos `routerApi` pasando `app` como argumento
   routerApi(app);
 
+  /*** USAMOS LAS FUNCIONES "MIDDLEWARES" ***/
+  // En el orden que los pongamos en estas lineas va a ser el orden con el cual se va a ejecutar uno tras el otro
+  app.use(logErrors);
+  app.use(errorHandler);
 
   // DECIRLE A NUESTRA APLICACION QUE DEBE ESCUCHAR EN UN PUERTO EN ESPECIFICO
   app.listen(port, () =>{

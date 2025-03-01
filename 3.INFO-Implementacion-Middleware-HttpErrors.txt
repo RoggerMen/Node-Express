@@ -1,0 +1,75 @@
+Resumen
+
+¿Cómo implementar middlewares para manejo de errores en JavaScript?
+Los middlewares son una herramienta poderosa al desarrollar aplicaciones en JavaScript. Entre sus múltiples usos, se destacan los middlewares para manejo de errores, que ayudan a capturar, formatear y gestionarlos de manera uniforme. En esta guía aprenderás cómo implementar y utilizar middlewares que capturen y gestionen errores de forma global en tu aplicación.
+
+¿Cómo configurar y comenzar con middlewares de error?
+La implementación de un middleware para manejo de errores comienza por organizar el código en una estructura limpia. Es recomendable crear una carpeta dedicada exclusivamente para los middlewares, asegurando una separación adecuada del código.
+
+1.Crear una carpeta para middleware:
+
+- Ubica la carpeta en la raíz del proyecto para una fácil localización.
+
+- Dentro de esta carpeta se alojarán los archivos correspondientes a cada middleware.
+
+2.Implementar el primer middleware:
+
+- Crea un archivo llamado errors.js dentro de la carpeta de middlewares.
+
+- Define una función para loguear errores, llamándola logErrors. Esta función capturará el error y lo desplegará en la consola. A continuación se presenta un ejemplo de cómo se vería esta función:
+
+function logErrors(err, req, res, next) {
+  console.error(err.stack);
+  next(err);
+}
+
+3.Middleware específico para formateo de errores:
+- Crea otra función llamada errorHandler, que formatea el error en un objeto JSON y lo envía al cliente. Aquí se muestra cómo podría implementarse:
+
+function errorHandler(err, req, res, next) {
+  res.status(500).json({
+    message: err.message,
+    stack: err.stack,
+  });
+}
+
+¿Cuáles son los pasos para integrar middlewares de error en la aplicación?
+
+Para que estos middlewares funcionen efectivamente, deben integrarse después de definir las rutas (routing) de la aplicación.
+
+- Importar middlewares: Utiliza "require" para importar las funciones "logErrors" y "errorHandler". Aquí cómo podrías importarlas:
+
+const { logErrors, errorHandler } = require('./middlewares/errors');
+
+- Añadir middlewares a la aplicación: Usa el método app.use() para incluir los middlewares en tu aplicación express:
+
+app.use(logErrors);
+app.use(errorHandler);
+
+- Verificar el orden de ejecución: Asegúrate de incluir los middlewares en el orden adecuado. Esto es crucial, ya que el primer middleware "logErrors" debe ejecutarse antes que "errorHandler". Puedes verificar el orden mediante logs en la consola.
+
+¿Cómo manejar errores de forma explícita en el routing?
+Para detectar y gestionar errores de manera efectiva, es necesario realizar algún manejo de errores a nivel de las rutas.
+
+- Integrar try-catch en las rutas: Un método efectivo es envolver el código de tu controladores de ruta en bloques "try-catch". De esta manera, los errores se pueden capturar y enviar explícitamente a través de "next(err)" para que sean manejados por los middlewares:
+
+app.get('/productos/:id', async (req, res, next) => {
+  try {
+    // lógica de obtención de producto
+  } catch (err) {
+    next(err); // Envía el error a los middlewares de manejo de error.
+  }
+});
+
+¿Cómo mejorar el tratamiento de errores?
+Una buena práctica es utilizar códigos de estado HTTP para comunicar correctamente la naturaleza del error al cliente y evitar asignar siempre un error 500. Por ejemplo:
+
+* 404: Producto no encontrado.
+
+* 409: Conflictos que indican alguna restricción de negocio que no se cumple.
+
+* 401 o 403: Falta de permisos.
+
+Asegúrate de adaptar la gestión de errores para utilizar los códigos de estado más adecuados, maximizando la claridad para el cliente y facilitando el mantenimiento.
+
+Implementar middlewares para errores es un paso esencial hacia una aplicación robusta y profesional. Sigue explorando estas técnicas avanzadas para optimizar tu desarrollo en JavaScript. ¡Continúa aprendiendo y perfeccionando tus habilidades en cada clase!
