@@ -1,6 +1,8 @@
 const express = require('express');
 // TRAEMOS EL SERVICIO
 const ProductsService = require('../services/productService');
+const validatorHandler = require('../middlewares/validatorHandler');
+const {createProductSchema, updateProductSchema, getProductSchema} = require('../schemas/productSchema');
 
 // CON CADA "router" de "express.Router" ESTAMOS DEFINIENDO LAS RUTAS PARA PRODUCTOS
 const router = express.Router();
@@ -26,7 +28,13 @@ const service = new ProductsService
   })
 
 // LE COLOCAMOS EL "next" PORQUE VAMOS A TRABAJAR CON LOS "middlewares" YA QUE EL ERROR OCURRE EN EL "findOne"
-  router.get('/:id', async (req, res, next) =>{
+  router.get('/:id',
+    // ANTES DEL MIDDLEWARE DE RUTA, LLAMAMOS AL MIDDLEWARE QUE VA A HACER LA VALIDACION DE DATOS
+    // SI TODO ESTA BIEN VA A PASAR POR EL "next()" INTERNO QUE TIENE Y PASA AL SIGUIENTE "middleware" DE RUTA
+    // tambien debemos DEFINIR que "schema" QUEREMOS VALIDAR EN ESTE CASO ES "/:id" la cual seria un "getProductSchema"
+    // LUEGO LE DECIMOS EN DONDE VA A ENCONTRAR ESA INFORMACION EN ESTE CASO QUEREMOS QUE LA INFORMACION VENGA DE  "params"
+    validatorHandler(getProductSchema, 'params' ),
+     async (req, res, next) =>{
     // AGREGAMOS UN TRYCATCH
     try {
       const id = req.params.id;
@@ -37,7 +45,9 @@ const service = new ProductsService
     }
   });
 
-  router.post('/', async (req, res) => {
+  router.post('/',
+    validatorHandler(createProductSchema, 'body'),
+    async (req, res) => {
     // PEDIMOS TODO EL CUERPO
     const body = req.body;
     const newProduct = await service.create(body);
@@ -47,7 +57,12 @@ const service = new ProductsService
   // el "PATCH" ES MUY PARECIDO A NUESTRO "POST" PORQUE TODO LO VA A RECIBIR EN UN CUERPO
   // LA UNICA DIFERENCIA ES QUE AQUI RECIBIMOS UN "id" EL ID DEL PRODUCTO QUE YO QUIERO EDITAR
   // EL "PATCH" NO NOS OBLIGA A ENVIAR TODOS LOS CAMPOS O ATRIBUTOS DEL PRODUCTO A ACTUALIZAR SINO QUE ES MAS FLEXIBLE Y PODEMOS ENVIARLE SOLO LOS QUE QUEREMOS ACTUALIZAR Y NO TODO EL OBJETO COMO LO HACE EL "PUT"
-  router.patch('/:id', async (req, res, next) => {
+  router.patch('/:id',
+    // PRIMERO VEMOS QUE EL "ID" CUMPLA CON LA VALIDACION DE "params"
+    validatorHandler(getProductSchema, 'params' ),
+    // LUEGO VAMOS A VALIDAR EL CUERPO("body")
+    validatorHandler(updateProductSchema, 'body'),
+    async (req, res, next) => {
     try {
       const id = req.params.id;
     // PEDIMOS TODO EL CUERPO

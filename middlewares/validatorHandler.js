@@ -16,7 +16,9 @@ function validatorHandler(schema, property) {
     return (req, res, next) =>{
       // COMO ES VALOR DEL OBJETO "req" Y TAMBIEN ES OBJETO EL "property"(body) ENTONCES HACEMOS QUE EL "req" QUE VIENE A SER LA CLAVE OBTENGA A SU VALOR PROPERTY QUE VIENE A SER "body"
       const data = req[property];
-      const error = schema.validate(data);
+      // SE AGREGO LAS LLAVES "{}" => {error}
+      // AGREGAMOS EL "aboutEarly: false" PARA ENCONTRAR TODOS LOS ERRORES Y ENVIARTE TODOS Y NO ERROR POR ERROR SINO QUE TE CORRIGE TODOS LOS ERRORES
+      const {error} = schema.validate(data, { abortEarly: false });
       if (error) {
         // SI HAY ERROR EN LA VALIDACIÓN, ENVIAMOS EL ERROR COMO UN STATUS 400
         // ENVIAMOS EL "error" QUE NOS ESTA ENVIANDO NUESTRO "schema"
@@ -28,10 +30,8 @@ function validatorHandler(schema, property) {
     }
 }
 
-
-module.exports = {
-    validatorHandler
-};
+// SE LE QUITO LAS "{}" LLAVES
+module.exports = validatorHandler;
 
 
 
