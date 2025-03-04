@@ -1,0 +1,13 @@
+Un breve resumen de las consideraciones para producción:
+
+*Cors: Que acceso y a quienes le damos acceso para hacer solicitudes
+
+*Https: Que la API esta sobre servidor de HTTPS
+
+*Procesos de Build: Se ve en procesos que cosas que tiene procesar información (typescript)
+
+*Remover logs: No es bueno tener logs, a veces esto tiene demoras, existen mejor formas para capturar logs.
+
+*Seguridad (helmet): Muy importante la seguridad y para esto se recomienda helmt que es una colección de Middleware que colocan capas de segridad a la aplicación
+
+*Testing: Correr prebas unitarias o de integración antes de salir de producción
