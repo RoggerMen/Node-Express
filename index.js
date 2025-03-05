@@ -1,5 +1,6 @@
 
   const express = require('express');
+  const cors = require('cors');
   // NO TENGO QUE LLAMAR AL "./routes/index" PORQUE YA ES ALGO QUE SE LLAMA POR AUTOMATICO(DEFECTO) POR SER EL ARCHIVO PRINCIPAL
   // EL ARCHIVO "index" ES EL QUE SE BUSCA POR AUTOMATICO
   const routerApi = require('./routes');
@@ -14,6 +15,28 @@
   // ESTE "middleware" LO VAMOS A USAR CUANDO NOSOTROS QUEREMOS EMPEZAR A RECIBIR INFORMACION EN EL FORMATO DE "JSON"
   // CON ESTE AJUSTE DEBERIAMOS DE RECIBIR INFORMACION DE TIPO JSON QUE NOS ENVIAN POR  "POST"
   app.use(express.json());
+
+  // DE ESTA MANERA ESTARIAMOS DICIENDOLE QUE VAMOS A HABILITAR ESTOS DOMINIOS, ESTOS ORIGENES Q VAN A TENER PERMISO DE HACER "REQUEST"
+  // Y ASI HACEMOS QUE EL VECTOR DE ATAQUE SEA MUCHO MENOR Y CUALQUIER PERSONA NO PUEDA ENVIAR REQUES ASI POR ASI
+  const whitelist = ['http://127.0.0.1:5500', 'https://myapp.com','http://127.0.0.1:3000'];
+  // INSTALAMOS "npm install -g http-server" QUE ES PARA NODEJS
+  // LUEGO USAMOS EN OTRA TERMINAL EL http-server -p 3000 O CUALQUIER OTRO NUMERO PARA CORRER EL PUERTO
+  // PARA QUE FUNCIONE HACEMOS ESTO
+  const options = {
+    origin: (origin, callback) => {
+      // SI REALMENTE ESE ORIGEN(DOMINIO) ESTA EN MI "whitelist" LA DEJAMOS PASAR Y EJECUTAMOS EL "callback" SINO PUES NO DEBERIAMOS DEJARLO PASAR
+      // tambien hacemos esta condicional "!origin" para aceptar el mismo origen
+      if (whitelist.includes(origin) || !origin) {
+      // ACA LE DECIMOS ESE "origen" ESTA INCLUIDO? SI ES ASI, EJECUTAMOS UN "callback" DONDE LE DECIMO QUE NO HAY NINGUN ERROR(null) Y LE DECIMOS QUE EL ACCESO ESTA PERMITIDO(true)
+      callback(null, true);
+      } else { // Y SI NO EJECUTAMOS NUEVAMENTE NUESTRO "callback" Y LO QUE HACEMOS ES RETORNAR DIRECTAMENTE UN ERROR
+        callback(new Error("NO PERMITIDO...!"))
+      }
+    }
+  }
+  // SIN ESTO POR DEFECTO SOLO ACEPTA SU MISMO ORIGEN(DOMINIO)
+  // 'cors()' CON ESTA CONFIGURACION AHORA ACEPTARIA CUALQUIER ORIGEN(DOMINIO)
+  app.use(cors(options));
 
   app.get("/", (req, res) =>{
     //console.log(req); // Esto imprimirá todo el objeto req en la consola
