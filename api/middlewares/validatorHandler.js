@@ -4,7 +4,6 @@ const boom = require('@hapi/boom');
 // NO VAMOS A RECIBIR DIRECTAMENTE EL (req, res, next) SI NO QUE RECIBIREMOS EL ESQUEMA(productSchema) QUE VAMOS A VALIDAR Y LA PROPIEDAD(EN DONDE ENCONTRAR LA INFORMACION)
 // Y LIEGO AL RETORNA SI ENVIAMOS (req, res, next) Y ASI ARMAMOS "MIDDLEWARES DE FORMA DINAMICA"
 function validatorHandler(schema, property) {
-  console.log("validatorHandler");
   // RETORNA UN MIDDLEWARE DE FORMA DINAMICA UTILIZANDO LA PROPIEDAD DE "CLOSURE"
   /** DEPENDE DE SI ES UN POST, GET, PUT TE DARA LA PROPIEDAD "property"
    *🔹 Si property = 'body', entonces estamos validando req.body.

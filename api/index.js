@@ -9,7 +9,7 @@
   const { logErrors, errorHandler, boomErrorHandler } = require('./middlewares/errorHandler');
 
   const app = express();
-  const port = 3000;
+  const port = process.env.PORT || 3000;
 
   // IMPLEMENTAMOS UN "MIDDLEWARE" NATIVO QUE TIENE "express" QUE ES "express.json()"
   // ESTE "middleware" LO VAMOS A USAR CUANDO NOSOTROS QUEREMOS EMPEZAR A RECIBIR INFORMACION EN EL FORMATO DE "JSON"
@@ -38,18 +38,18 @@
   // 'cors()' CON ESTA CONFIGURACION AHORA ACEPTARIA CUALQUIER ORIGEN(DOMINIO)
   app.use(cors(options));
 
-  app.get("/", (req, res) =>{
+  app.get("/api", (req, res) =>{
     //console.log(req); // Esto imprimirá todo el objeto req en la consola
     //COMO NOSOTROS NECESITAMOS RETORNAR ENTONCES USAMOS EL RESPONSE
     res.send("Hola Mi Server en Express");
     //console.log("Respuesta del servidor "  ,res)
   });
 
-  app.get("/nueva-ruta", (req, res) => {
+  app.get("/api/nueva-ruta", (req, res) => {
     res.send("<h1>Esta es la ruta nueva</h1>");
   });
 
-  app.get("/home", (req, res) => {
+  app.get("/api/home", (req, res) => {
     res.send("<h1>ESTA ES LA RUTA PRINCIPAL</h1>");
   });
 
